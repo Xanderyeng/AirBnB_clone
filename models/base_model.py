@@ -8,12 +8,26 @@ class BaseModel:
 
     """Base class for all other models."""
 
-    def __init__(self, **kwargs):
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
+    def __init__(self, *args, **kwargs):
+        if kwargs:
+            kwargs_copy = kwargs.copy()
+            if "__class__" in kwargs_copy:
+                del kwargs_copy["__class__"]
+            kwargs_copy["created_at"] = datetime.strptime(
+                    kwargs_copy["created_at"], '%Y-%m-%dT%H:%M:%S.%f'
+                    )
+            kwargs_copy["updated_at"] = datetime.strptime(
+                    kwargs_copy["updated_at"], '%Y-%m-%dT%H:%M:%S.%f'
+                    )
+            for key, value in kwargs_copy.items():
+                setattr(self, key, value)
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
 
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
     def __str__(self):
         """String representation of the model."""
@@ -22,7 +36,7 @@ class BaseModel:
 
     def save(self):
         """Updates the updated_at attribute with the current datetime."""
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.now().strftime("%A %d %B %Y at %H:%M:%S")
 
     def to_dict(self):
         """Returns a dictionary representation of the model."""

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+import json
 
 
 class BaseModel:
@@ -8,7 +9,6 @@ class BaseModel:
 
     id = str(uuid.uuid4())
     created_at = datetime.now()
-    updated_at = datetime.now()
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
@@ -33,3 +33,9 @@ class BaseModel:
     dict_["created_at"] = self.created_at.isoformat()
     dict_["updated_at"] = self.updated_at.isoformat()
     return dict_
+
+    def save_to_file(self):
+        """Saves the model instance to a file in JSON format."""
+        filename = f"{self.__class__.__name__}_{self.id}.json"
+        with open(filename, "w") as file:
+            json.dump(self.to_dict(), file)

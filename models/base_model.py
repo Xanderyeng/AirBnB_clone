@@ -2,6 +2,7 @@
 import uuid
 from datetime import datetime
 import json
+from models.__init__ import storage
 
 
 class BaseModel:

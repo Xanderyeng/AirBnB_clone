@@ -2,7 +2,7 @@
 import uuid
 from datetime import datetime
 import json
-from models.__init__ import storage
+from models.engine import storage
 
 
 class BaseModel:
@@ -38,6 +38,7 @@ class BaseModel:
     def save(self):
         """Updates the updated_at attribute with the current datetime."""
         self.updated_at = datetime.now().strftime("%A %d %B %Y at %H:%M:%S")
+        storage.save()
 
     def to_dict(self):
         """Returns a dictionary representation of the model."""

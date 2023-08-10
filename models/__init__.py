@@ -3,8 +3,10 @@
 # TO CREATE A BASEMODE FOR THEM ( INHERITANCE )
 
 
-from .base_model import BaseModel
+# from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
+
+# base_model_instance = BaseModel()
 
 storage = FileStorage()
 storage.reload()

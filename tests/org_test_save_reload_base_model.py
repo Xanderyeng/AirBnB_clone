@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+import sys
+import os
+
+# The path to my parent/root directory (Airbnb) to sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from models import storage
 from models.base_model import BaseModel
 

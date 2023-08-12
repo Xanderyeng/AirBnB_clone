@@ -27,9 +27,6 @@ class BaseModel:
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
 
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-
     def __str__(self):
         """String representation of the model."""
         return "[{}] ({}) {}".format(
@@ -37,8 +34,11 @@ class BaseModel:
 
     def save(self):
         """Updates the updated_at attribute with the current datetime."""
-        """self.updated_at = datetime.now().strftime("%A %d %B %Y at %H:%M:%S")"""
+        from models import storage
+        """self.updated_at = datetime.now().
+        strftime("%A %d %B %Y at %H:%M:%S")"""
         self.updated_at = datetime.now()
+        storage.new(self)
         storage.save()
 
     def to_dict(self):
@@ -52,9 +52,3 @@ class BaseModel:
         dict_["created_at"] = self.created_at.isoformat()
         dict_["updated_at"] = self.updated_at.isoformat()
         return dict_
-
-    def save_to_file(self):
-        """Saves the model instance to a file in JSON format."""
-        filename = f"{self.__class__.__name__}_{self.id}.json"
-        with open(filename, "w") as file:
-            json.dump(self.to_dict(), file)

@@ -26,6 +26,11 @@ class FileStorage:
         with open(FileStorage.__file_path, "w") as file:
             json.dump(serialized_objs, file)
 
+    def get(self, cls, id):
+        """Retrieve an object based on class name and ID."""
+        key = "{}.{}".format(cls.__name__, id)
+        return self.__objects.get(key, None)
+
     def reload(self):
         """Deserializes the JSON file to __objects (if it exists)."""
         print("Reading from json file...")

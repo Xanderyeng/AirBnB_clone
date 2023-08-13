@@ -1,4 +1,5 @@
 import unittest
+from models import storage
 from models import FileStorage
 from models import BaseModel
 

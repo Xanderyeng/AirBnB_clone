@@ -1,75 +1,48 @@
-#!/usr/bin/python3
-"""This module defines a class to manage file storage for hbnb clone"""
 import json
+# import os
+from models.base_model import BaseModel
 
 
 class FileStorage:
-    """This class manages storage of hbnb models in JSON format"""
-    __file_path = 'file.json'
+    __file_path = "file.json"
     __objects = {}
 
-    def all(self, cls=None):
-        """Returns a dictionary of models currently in storage"""
-        dic = {}
-        if cls is None:
-            for key, value in FileStorage.__objects.copy().items():
-                dic[key] = value
-            return FileStorage.__objects
-        for key, value in FileStorage.__objects.items():
-            lista = key.split(".")
-            if type(cls) is str:
-                if lista[0] == cls:
-                    dic[key] = value
-            else:
-                if lista[0] == cls.__name__:
-                    dic[key] = value
-        return dic
+    def all(self):
+        """Returns the dictionary __objects."""
+        return FileStorage.__objects
 
     def new(self, obj):
-        """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        """Sets in __objects the obj with key <obj class name>.id."""
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        FileStorage.__objects[key] = obj
 
     def save(self):
-        """Saves storage dictionary to file"""
-        with open(FileStorage.__file_path, 'w') as f:
-            temp = {}
-            temp.update(FileStorage.__objects)
-            for key, val in temp.items():
-                temp[key] = val.to_dict()
-            json.dump(temp, f)
+        """Serializes __objects to the JSON file."""
+        print("Saving to json file...")
+        serialized_objs = {
+                key: obj.to_dict() for key,
+                obj in FileStorage.__objects.items()
+                }
+        with open(FileStorage.__file_path, "w") as file:
+            json.dump(serialized_objs, file)
+
+    def get(self, cls, id):
+        """Retrieve an object based on class name and ID."""
+        key = "{}.{}".format(cls.__name__, id)
+        return self.__objects.get(key, None)
 
     def reload(self):
-        """Loads storage dictionary from file"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-        classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
+        """Deserializes the JSON file to __objects (if it exists)."""
+        print("Reading from json file...")
         try:
-            temp = {}
-            with open(FileStorage.__file_path, 'r') as f:
-                temp = json.load(f)
-                for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+            with open(FileStorage.__file_path, "r") as file:
+                data = json.load(file)
+                for key, value in data.items():
+                    class_name, obj_id = key.split('.')
+                    class_obj = (
+                            BaseModel if class_name == "BaseModel" else None
+                            )
+                    if class_obj:
+                        self.__objects[key] = class_obj(**value)
         except FileNotFoundError:
             pass
-
-    def delete(self, obj=None):
-        """ delete object from FileStorage.__objects """
-        if obj is None:
-            return
-        for key, value in FileStorage.__objects.copy().items():
-            if obj.to_dict() == value.to_dict():
-                FileStorage.__objects.pop(key, None)
-        self.save()
-
-    def close(self):
-        """ call reload() for deserializing """
-        self.reload()

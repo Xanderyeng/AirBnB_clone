@@ -46,3 +46,8 @@ class FileStorage:
                         self.__objects[key] = class_obj(**value)
         except FileNotFoundError:
             pass
+
+
+# Creating a unique FileStorage instance
+storage = FileStorage()
+storage.reload()

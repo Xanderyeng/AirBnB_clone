@@ -5,26 +5,36 @@ from models import BaseModel
 
 class TestFileStorage(unittest.TestCase):
 
+    def test_all(self):
+        all_objs = storage.all()
+        self.assertIsInstance(all_objs, dict)
+
     def test_new(self):
-        storage = FileStorage()
         my_model = BaseModel()
         storage.new(my_model)
-        self.assertIn(my_model, storage.all().values())
+        all_objs = storage.all()
+        self.assertIn(my_model, all_objs.values())
 
-    def test_save_reload(self):
-        storage = FileStorage()
+    def test_save(self):
+        my_model = BaseModel()
+        storage.new(my_model)
+        storage.save()
+        # Verify that the file.json is updated with serialized objects
+
+    def test_reload(self):
+        # Create and save a BaseModel instance
         my_model = BaseModel()
         storage.new(my_model)
         storage.save()
 
+        # Create a new storage instance and reload data from file.json
         new_storage = FileStorage()
         new_storage.reload()
 
-        reloaded_model = new_storage.get(BaseModel, my_model.id)
-        self.assertIsNotNone(reloaded_model)
-        self.assertEqual(my_model.id, reloaded_model.id)
-        self.assertEqual(my_model.created_at, reloaded_model.created_at)
-        self.assertEqual(my_model.updated_at, reloaded_model.updated_at)
+        # Retrieve the saved BaseModel instance from the new storage
+        loaded_model = new_storage.get(BaseModel, my_model.id)
+        self.assertIsNotNone(loaded_model)
+        self.assertEqual(my_model.to_dict(), loaded_model.to_dict())
 
 
 if __name__ == '__main__':

@@ -78,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -362,14 +362,16 @@ class HBNBCommand(cmd.Cmd):
 
     def param_ver(self, string):
         """ verifies if params is acceptable name="California" """
-        p_str = re.compile('\w+=".+"')
-        p_float = re.compile('\w+=-*\d+\.\d+')
-        p_int = re.compile('\w+=-*\d+')
+        p_str = re.compile(r'\w+="[^"]+"')
+        p_float = re.compile(r'\w+=-?\d+\.\d+')
+        p_int = re.compile(r'\w+=-?\d+')
+
         if p_str.match(string) is None and\
             p_float.match(string) is None and\
                 p_int.match(string) is None:
             return False
         return True
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()

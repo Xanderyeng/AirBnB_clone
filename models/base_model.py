@@ -10,22 +10,28 @@ class BaseModel:
     """Base class for all other models."""
 
     def __init__(self, *args, **kwargs):
-        if kwargs:
-            kwargs_copy = kwargs.copy()
-            if "__class__" in kwargs_copy:
-                del kwargs_copy["__class__"]
-            kwargs_copy["created_at"] = datetime.strptime(
-                    kwargs_copy["created_at"], '%Y-%m-%dT%H:%M:%S.%f'
-                    )
-            kwargs_copy["updated_at"] = datetime.strptime(
-                    kwargs_copy["updated_at"], '%Y-%m-%dT%H:%M:%S.%f'
-                    )
-            for key, value in kwargs_copy.items():
-                setattr(self, key, value)
-        else:
+        """Instatntiates a new model"""
+        if not kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
+        else:
+            if 'updated_at' in kwargs.keys():
+                kwargs['updated_at'] = datetime.strptime(
+                    kwargs['updated_at'],
+                    '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                self.updated_at = datetime.now()
+            if 'created_at' in kwargs.keys():
+                kwargs['created_at'] = datetime.strptime(
+                    kwargs['created_at'],
+                    '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                self.created_at = datetime.now()
+            kwargs.pop('__class__', None)
+            if 'id' not in kwargs:
+                self.id = str(uuid.uuid4())
+            self.__dict__.update(kwargs)
 
     def __str__(self):
         """String representation of the model."""

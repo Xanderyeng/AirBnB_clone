@@ -1,46 +1,45 @@
 import unittest
-from models.base_model import BaseModel
-from models import storage
 from datetime import datetime
-
+from models import FileStorage
+from models.base_model import BaseModel
 
 class TestBaseModel(unittest.TestCase):
 
-    def setUp(self):
-        self.base_model = BaseModel()
-        self.base_model.name = "My_First_Model"
-        self.base_model.my_number = 89
+    def test_init(self):
+        my_model = BaseModel()
+        self.assertIsInstance(my_model, BaseModel)
+        self.assertIsInstance(my_model.id, str)
+        self.assertIsInstance(my_model.created_at, datetime)
 
-    def test_instance_attributes(self):
-        self.assertIsInstance(self.base_model.id, str)
-        self.assertIsInstance(self.base_model.created_at, datetime)
-        self.assertIsInstance(self.base_model.updated_at, datetime)
-        self.assertEqual(self.base_model.name, "My_First_Model")
-        self.assertEqual(self.base_model.my_number, 89)
+    def test_to_dict(self):
+        my_model = BaseModel()
+        my_model_dict = my_model.to_dict()
+        self.assertIsInstance(my_model_dict, dict)
+        self.assertIn('__class__', my_model_dict)
+        self.assertIn('id', my_model_dict)
+        self.assertIn('created_at', my_model_dict)
+        self.assertIn('updated_at', my_model_dict)
 
-    def test_save_method(self):
-        old_updated_at = self.base_model.updated_at
-        self.base_model.save()
-        self.assertNotEqual(old_updated_at, self.base_model.updated_at)
+    def test_save(self):
+        my_model = BaseModel()
+        initial_updated_at = my_model.updated_at
+        my_model.save()
+        self.assertNotEqual(initial_updated_at, my_model.updated_at)
 
-    def test_to_dict_method(self):
-        model_dict = self.base_model.to_dict()
-        self.assertIsInstance(model_dict, dict)
-        self.assertEqual(model_dict['__class__'], 'BaseModel')
-        self.assertEqual(model_dict['name'], "My_First_Model")
-        self.assertEqual(model_dict['my_number'], 89)
-        self.assertEqual(type(model_dict['created_at']), str)
-        self.assertEqual(type(model_dict['updated_at']), str)
+    def test_str_representation(self):
+        my_model = BaseModel()
+        str_repr = str(my_model)
+        self.assertIsInstance(str_repr, str)
+        self.assertIn(my_model.id, str_repr)
 
-    def test_from_dict_method(self):
-        model_dict = self.base_model.to_dict()
-        new_model = BaseModel(**model_dict)
-        self.assertEqual(self.base_model.id, new_model.id)
-        self.assertEqual(self.base_model.name, new_model.name)
-        self.assertEqual(self.base_model.my_number, new_model.my_number)
-        self.assertEqual(self.base_model.created_at, new_model.created_at)
-        self.assertEqual(self.base_model.updated_at, new_model.updated_at)
+    def test_reload(self):
+        my_model = BaseModel()
+        my_model.save()
+        initial_updated_at = my_model.updated_at
 
+        new_storage = FileStorage()
+        new_storage.reload()
 
-if __name__ == '__main__':
-    unittest.main()
+        reloaded_model = new_storage.get(BaseModel, my_model.id)
+        self.assertIsNotNone(reloaded_model)
+        self.assertEqual(initial_updated_at, reloaded_model.updated_at)

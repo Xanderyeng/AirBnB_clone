@@ -2,6 +2,7 @@ import unittest
 from models import FileStorage
 from models import BaseModel
 
+
 class TestFileStorage(unittest.TestCase):
 
     def test_new(self):
@@ -25,3 +26,6 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(my_model.created_at, reloaded_model.created_at)
         self.assertEqual(my_model.updated_at, reloaded_model.updated_at)
 
+
+if __name__ == '__main__':
+    unittest.main()

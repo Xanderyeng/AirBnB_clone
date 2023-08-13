@@ -3,6 +3,7 @@ from datetime import datetime
 from models import FileStorage
 from models.base_model import BaseModel
 
+
 class TestBaseModel(unittest.TestCase):
 
     def test_init(self):
@@ -43,3 +44,7 @@ class TestBaseModel(unittest.TestCase):
         reloaded_model = new_storage.get(BaseModel, my_model.id)
         self.assertIsNotNone(reloaded_model)
         self.assertEqual(initial_updated_at, reloaded_model.updated_at)
+
+
+if __name__ == '__main__':
+    unittest.main()
